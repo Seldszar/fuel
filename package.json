@@ -1,0 +1,52 @@
+{
+  "private": true,
+  "name": "fuel",
+  "version": "0.0.0-development",
+  "description": "Interactive countdown using Twitch Channel Points",
+  "repository": "seldszar/fuel",
+  "license": "MIT",
+  "bin": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "files": [
+    "index.js"
+  ],
+  "dependencies": {
+    "@sindresorhus/slugify": "^1.0.0",
+    "conf": "^7.0.1",
+    "consola": "^2.14.0",
+    "exit-hook": "^2.2.0",
+    "luxon": "^1.24.1",
+    "twitchps": "^1.5.1",
+    "write-file-atomic": "^3.0.3"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^9.0.1",
+    "@commitlint/config-conventional": "^9.0.1",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.11",
+    "xo": "^0.32.1"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,ts}": "xo --fix"
+  },
+  "release": {
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/github",
+      "@semantic-release/release-notes-generator"
+    ]
+  }
+}
