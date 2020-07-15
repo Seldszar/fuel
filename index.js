@@ -25,6 +25,14 @@ async function main() {
 				type: 'string',
 				default: ''
 			},
+			maxTime: {
+				type: 'number',
+				default: Infinity
+			},
+			offsetTime: {
+				type: 'number',
+				default: 0
+			},
 			rewards: {
 				type: 'array',
 				items: {
@@ -105,10 +113,8 @@ async function main() {
 			lastUpdate = Date.now();
 
 			const elapsedTime = state.get('elapsedTime') + deltaTime;
-			const maxTime = options.get('maxTime', 0);
-
 			const remainingTime = Math.max(
-				Math.min(state.get('availableTime'), maxTime > 0 ? maxTime : Infinity) -
+				Math.min(options.get('offsetTime') + state.get('availableTime'), options.get('maxTime')) -
         elapsedTime,
 				0
 			);

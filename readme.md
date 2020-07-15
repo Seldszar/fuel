@@ -20,6 +20,7 @@ A file named `data/files/time.txt` will be also generated displaying the countdo
 | `accessToken`     | String | The access token                                   |
 | `userId`          | String | The user ID for listening reward redemptions       |
 | `maxTime`         | Number | The maximum time (in milliseconds)                 |
+| `offsetTime`      | Number | The offset time (in milliseconds)                  |
 | `rewards`         | Object | the supported rewards                              |
 | `rewards[].title` | String | The rewards title                                  |
 | `rewards[].time`  | Number | The time to add to the countdown (in milliseconds) |
