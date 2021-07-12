@@ -7,13 +7,12 @@
   "license": "MIT",
   "bin": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "test": "xo"
   },
   "files": [
     "index.js"
   ],
   "dependencies": {
-    "@sindresorhus/slugify": "^1.0.0",
     "conf": "^7.0.1",
     "consola": "^2.14.0",
     "exit-hook": "^2.2.0",
