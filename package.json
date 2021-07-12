@@ -17,6 +17,7 @@
     "conf": "^7.0.1",
     "consola": "^2.14.0",
     "exit-hook": "^2.2.0",
+    "lodash.find": "^4.6.0",
     "luxon": "^1.24.1",
     "twitchps": "^1.5.1",
     "write-file-atomic": "^3.0.3"
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@commitlint/cli": "^9.0.1",
     "@commitlint/config-conventional": "^9.0.1",
+    "@semantic-release/exec": "^5.0.0",
     "husky": "^4.2.5",
     "lint-staged": "^10.2.11",
     "xo": "^0.32.1"
@@ -42,11 +44,12 @@
   "lint-staged": {
     "*.{js,ts}": "xo --fix"
   },
-  "release": {
-    "plugins": [
-      "@semantic-release/commit-analyzer",
-      "@semantic-release/github",
-      "@semantic-release/release-notes-generator"
+  "pkg": {
+    "outputPath": "build",
+    "targets": [
+      "node14-linux-x64",
+      "node14-macos-x64",
+      "node14-win-x64"
     ]
   }
 }

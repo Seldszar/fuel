@@ -1,8 +1,8 @@
-const slugify = require('@sindresorhus/slugify');
 const Conf = require('conf');
 const {Consola, FancyReporter} = require('consola');
 const exitHook = require('exit-hook');
 const fs = require('fs');
+const find = require('lodash.find');
 const {Duration} = require('luxon');
 const PubSub = require('twitchps');
 const writeFileAtomic = require('write-file-atomic');
@@ -17,35 +17,38 @@ async function main() {
 				type: 'string',
 				default: ''
 			},
-			level: {
-				type: 'string',
-				default: 'info'
-			},
 			userId: {
 				type: 'string',
 				default: ''
-			},
-			maxTime: {
-				type: 'number',
-				default: Infinity
 			},
 			offsetTime: {
 				type: 'number',
 				default: 0
 			},
-			rewards: {
+			maxTime: {
+				type: 'number'
+			},
+			level: {
+				type: 'string',
+				default: 'info'
+			},
+			events: {
 				type: 'array',
+				default: [],
 				items: {
 					type: 'object',
 					properties: {
-						title: {
+						type: {
 							type: 'string'
+						},
+						args: {
+							type: 'object'
 						},
 						time: {
 							type: 'number'
 						}
 					},
-					required: ['title', 'time']
+					required: ['type', 'time']
 				}
 			}
 		}
@@ -75,7 +78,7 @@ async function main() {
 	if (!options.get('accessToken')) {
 		console.error('Access token not found in the configuration file.');
 		console.error(
-			'Please fill the access token field with information from this URL: https://twitchtokengenerator.com/quick/qpAysiw5Ox'
+			'Please fill the access token field with information from this URL: https://twitchtokengenerator.com/quick/23xIOzCAZV'
 		);
 
 		return;
@@ -144,9 +147,16 @@ async function main() {
 			{
 				topic: `channel-points-channel-v1.${options.get('userId')}`,
 				token: options.get('accessToken')
+			},
+			{
+				topic: `channel-subscribe-events-v1.${options.get('userId')}`,
+				token: options.get('accessToken')
 			}
 		]
 	});
+
+	const findEvent = (type, args) => find(options.get('events'), {type, args});
+	const incrementTime = time => state.set('availableTime', state.get('availableTime') + time);
 
 	ps.on('connected', () => {
 		consola.info('Connected to Twitch PubSub service');
@@ -159,14 +169,30 @@ async function main() {
 	ps.on('channel-points', data => {
 		consola.debug('Reward redemption event received', data);
 
-		const rewards = options.get('rewards');
-		const reward = rewards.find(
-			reward => reward.id === data.reward.id || slugify(reward.title) === slugify(data.reward.title)
-		);
+		const event = findEvent('reward', {
+			title: data.reward.title,
+			id: data.reward.id
+		});
 
-		if (reward) {
-			consola.info('Reward redeemed: %s', reward.title);
-			state.set('availableTime', state.get('availableTime') + reward.time);
+		if (event) {
+			consola.info('Reward redemption event: %s by %s', data.reward.title, data.user.login);
+
+			incrementTime(event.time);
+		}
+	});
+
+	ps.on('subscribe', data => {
+		consola.debug('Subscription event received', data);
+
+		const event = findEvent('subscription', {
+			tier: data.sub_plan,
+			type: data.context
+		});
+
+		if (event) {
+			consola.info('Subscription event: %s month(s) from %s (%s)', data.months, data.user_name, data.sub_plan_name);
+
+			incrementTime(event.time * (data.multi_month_duration || 1));
 		}
 	});
 
